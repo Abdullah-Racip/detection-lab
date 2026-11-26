@@ -1,0 +1,15 @@
+# Suricata output from local replays
+suricata-out/
+suricata-benign/
+eve.json
+fast.log
+stats.log
+suricata.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Editors / OS
+.vscode/
+.DS_Store
