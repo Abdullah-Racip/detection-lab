@@ -1,0 +1,37 @@
+title: Drupalgeddon2 (CVE-2018-7600) Render Array Injection in Web Server Logs
+id: 6dc913f5-07d9-4a7a-96f3-825e2e9f1276
+status: experimental
+description: >
+  Detects Drupalgeddon2 exploitation on Drupal 7 via web server access logs.
+  Stage 1 injects a '#post_render' render-array property through the URL
+  (user/password form). Stage 2 triggers it via file/ajax with a '#value'
+  element path. Matching is on raw, URL-encoded log values, so both literal
+  and %2F-encoded slashes are covered.
+references:
+  - https://www.drupal.org/sa-core-2018-002
+  - https://nvd.nist.gov/vuln/detail/CVE-2018-7600
+author: Abdullah Racip
+date: 2026-11-26
+tags:
+  - attack.initial-access
+  - attack.t1190
+  - cve.2018-7600
+logsource:
+  category: webserver
+detection:
+  stage1_injection:
+    cs-uri-query|contains: '%23post_render'
+  stage2_query_path:
+    cs-uri-query|contains:
+      - 'file/ajax/'
+      - 'file%2fajax%2f'
+  stage2_query_value:
+    cs-uri-query|contains: '%23value'
+  stage2_clean_url:
+    cs-uri-stem|contains|all:
+      - '/file/ajax/'
+      - '%23value'
+  condition: stage1_injection or (stage2_query_path and stage2_query_value) or stage2_clean_url
+falsepositives:
+  - Unlikely. Legitimate Drupal requests never set render-array properties (#...) through the URL.
+level: critical
